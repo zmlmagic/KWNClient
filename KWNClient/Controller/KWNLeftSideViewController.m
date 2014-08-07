@@ -145,14 +145,14 @@
             KWNShareViewController *controller_share = [[KWNShareViewController alloc] init];
             [[RESideMenu sharedInstance] hideMenuViewController];
             KWNHomeViewController *controller_home = (KWNHomeViewController *)[RESideMenu sharedInstance].contentViewController;
-            [controller_home pushViewController:controller_share];
+            [controller_home.navigationController pushViewController:controller_share animated:YES];
             
         }break;
         case 3:{
             KWNSetViewController *controller_set = [[KWNSetViewController alloc] init];
             [[RESideMenu sharedInstance] hideMenuViewController];
             KWNHomeViewController *controller_home = (KWNHomeViewController *)[RESideMenu sharedInstance].contentViewController;
-            [controller_home pushViewController:controller_set];
+            [controller_home.navigationController pushViewController:controller_set animated:YES];
         }break;
         default:
             break;

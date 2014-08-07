@@ -14,6 +14,7 @@
 #import "KWNChatViewController.h"
 #import "KWNTextSendViewController.h"
 #import "Model_space.h"
+#import "KWNSoundSendViewController.h"
 
 @interface KWNHomeViewController ()<UITableViewDataSource,UITableViewDelegate>
 
@@ -26,13 +27,28 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self){
-        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notification_textClick:) name:@"notification_text"  object:nil];
+        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+        {
+            [self setNeedsStatusBarAppearanceUpdate];
+            //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notification_textClick:) name:@"notification_text"  object:nil];
+        }
     }
     return self;
 }
 
-- (void)dealloc{
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
 
+- (BOOL)prefersStatusBarHidden
+{
+    return NO;
+}
+
+- (void)dealloc{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"notification_text" object:nil];
 }
 
 - (void)viewDidLoad{
@@ -92,18 +108,18 @@
     [button_company addTarget:self action:@selector(didClickButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button_company];
     
-    UITableView *tableView_home = [[UITableView alloc] initWithFrame:CGRectMake(imageView_background.frame.origin.x, imageView_background.frame.origin.y + imageView_background.frame.size.height, imageView_background.frame.size.width, self.view.frame.size.height - imageView_background.frame.size.height - imageView_title.frame.size.height - 50)];
-    tableView_home.backgroundColor = [UIColor clearColor];
+    UITableView *tableView_home = [[UITableView alloc] initWithFrame:CGRectMake(imageView_background.frame.origin.x, imageView_background.frame.origin.y + imageView_background.frame.size.height, imageView_background.frame.size.width, self.view.frame.size.height - imageView_background.frame.size.height - imageView_title.frame.size.height - 45)];
+    tableView_home.backgroundColor = RGB(227, 227, 227);
     tableView_home.separatorStyle = UITableViewCellSeparatorStyleNone;
     tableView_home.delegate = self;
     tableView_home.dataSource = self;
     [self.view addSubview:tableView_home];
     
-    UIImageView *imageView_inputBackground = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 50, 320, 50)];
+    /*UIImageView *imageView_inputBackground = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 50, 320, 50)];
     imageView_inputBackground.image = [UIImage imageFileName:@"imageView_inputBack.png"];
-    [self.view addSubview:imageView_inputBackground];
+    [self.view addSubview:imageView_inputBackground];*/
     
-    UIButton *button_inputText = [UIButton buttonWithType:UIButtonTypeCustom];
+    /*UIButton *button_inputText = [UIButton buttonWithType:UIButtonTypeCustom];
     button_inputText.frame = CGRectMake(imageView_inputBackground.frame.origin.x + 10, imageView_inputBackground.frame.origin.y + 5, 39, 39);
     button_inputText.backgroundColor = [UIColor clearColor];
     [button_inputText setImage:[UIImage imageFileName:@"button_inputText.png"] forState:UIControlStateNormal];
@@ -117,7 +133,7 @@
     [button_downSpeak setImage:[UIImage imageFileName:@"button_downSpeak.png"] forState:UIControlStateNormal];
     [button_downSpeak addTarget:self action:@selector(didClickButton:) forControlEvents:UIControlEventTouchUpInside];
     button_downSpeak.tag = 6;
-    [self.view addSubview:button_downSpeak];
+    [self.view addSubview:button_downSpeak];*/
 }
 
 - (void)didClickButton:(UIButton *)button
@@ -143,6 +159,8 @@
             [view_all showAnimated];
             
             [Model_space sharedModel].int_space = 1;
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receive_single:) name:@"didClickFinish_single" object:nil];
+            
             
         }break;
         case 3:
@@ -155,10 +173,12 @@
             
             [Model_space sharedModel].int_space = 2;
             
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receive_single:) name:@"didClickFinish_single" object:nil];
+            
         }break;
         case 4:
         {
-            if([Model_space sharedModel].string_text || [Model_space sharedModel].string_voicePath)
+            if([Model_space sharedModel].controller_chat)
             {
                 KWNChatViewController *controller_chat = [Model_space sharedModel].controller_chat;
                 [self presentViewController:controller_chat animated:YES completion:nil];
@@ -174,8 +194,7 @@
             if([Model_space sharedModel].string_space)
             {
                 KWNTextSendViewController *textSend = [[KWNTextSendViewController alloc] init];
-                [self pushViewController:textSend];
-                
+                [self.navigationController pushViewController:textSend animated:YES];
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_send) name:@"didClickSend" object:nil];
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_back) name:@"didClickBack" object:nil];
             }
@@ -189,7 +208,6 @@
                 [Model_space sharedModel].int_space = 0;
                 
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification) name:@"didClickFinish" object:nil];
-                
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_send) name:@"didClickSend" object:nil];
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_back) name:@"didClickBack" object:nil];
             }
@@ -199,8 +217,8 @@
             _bool_sound = YES;
             if([Model_space sharedModel].string_space)
             {
-                [Model_space sharedModel].string_text =nil;
-                [Model_space sharedModel].string_voicePath = nil;
+                //[Model_space sharedModel].string_text =nil;
+                //[Model_space sharedModel].model_sound = nil;
                 
                 KWNChatViewController *chat = [[KWNChatViewController alloc] init];
                 [Model_space sharedModel].controller_chat = chat;
@@ -225,33 +243,89 @@
     }
 }
 
+#pragma mark - 点击键盘 -
+/**
+ *  点击键盘
+ */
+- (void)notification_textClick:(NSNotification *)notification{
+    _bool_sound = NO;
+    if([Model_space sharedModel].string_space){
+        KWNTextSendViewController *textSend = [[KWNTextSendViewController alloc] init];
+        [self.navigationController pushViewController:textSend animated:YES];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_send) name:@"didClickSend" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_back) name:@"didClickBack" object:nil];
+    }else{
+        [RESideMenu sharedInstance].panGestureEnabled = NO;
+        ChangeView_all *view_all = [[ChangeView_all alloc] initWithFrame:CGRectMake(0, 0, 320, [[UIScreen mainScreen] currentMode].size.height/2)];
+        [view_all configureViewWihtTag:0];
+        [self.view addSubview:view_all];
+        [view_all showAnimated];
+        //[Model_space sharedModel].int_space = 0;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification) name:@"didClickFinish" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_send) name:@"didClickSend" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_back) name:@"didClickBack" object:nil];
+    }
+}
+
 - (void)receiveNotification
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didClickFinish" object:nil];
     
     if(_bool_sound)
     {
-        [Model_space sharedModel].string_text =nil;
-        [Model_space sharedModel].string_voicePath = nil;
+        //[Model_space sharedModel].string_text =nil;
+        //[Model_space sharedModel].model_sound = nil;
         
-        KWNChatViewController *chat = [[KWNChatViewController alloc] init];
+        KWNSoundSendViewController *sound = [[KWNSoundSendViewController alloc] init];
+        [self.navigationController pushViewController:sound animated:YES];
+        //[Model_space sharedModel].string_text =nil;
+        //[Model_space sharedModel].string_voicePath = nil;
+        /*KWNChatViewController *chat = [[KWNChatViewController alloc] init];
         [Model_space sharedModel].controller_chat = chat;
-        [self presentViewController:chat animated:YES completion:nil];
+        [self presentViewController:chat animated:YES completion:nil];*/
     }
     else
     {
-        KWNTextSendViewController *textSend = [[KWNTextSendViewController alloc] init];
-        [self pushViewController:textSend];
+        if([Model_space sharedModel].string_space)
+        {
+        
+            //[Model_space sharedModel].string_text =nil;
+            //[Model_space sharedModel].model_sound = nil;
+            
+            KWNTextSendViewController *textSend = [[KWNTextSendViewController alloc] init];
+            [self.navigationController pushViewController:textSend animated:YES];
+        }else{
+            return;
+        }
+    }
+}
+
+- (void)receive_single:(NSNotification *)notification{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didClickFinish_single" object:nil];
+    
+    [Model_space sharedModel].string_text =nil;
+    [Model_space sharedModel].model_sound = nil;
+    
+    if([Model_space sharedModel].string_space)
+    {
+        KWNChatViewController *chat = [[KWNChatViewController alloc] init];
+        [Model_space sharedModel].controller_chat = chat;
+        [self presentViewController:chat animated:YES completion:nil];
     }
 }
 
 - (void)receiveNotification_send
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didClickSend" object:nil];
-    
     KWNChatViewController *chat = [[KWNChatViewController alloc] init];
     [Model_space sharedModel].controller_chat = chat;
-    [self presentViewController:chat animated:YES completion:nil];
+
+    double delayInSeconds = 0.1;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        [self presentViewController:chat animated:YES completion:nil];
+    });
 }
 
 - (void)receiveNotification_back
@@ -328,9 +402,58 @@
     return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return tableView.frame.size.height + 50;
+}
+
+/**
+ *  发送语音消息的回调方法
+ *
+ *  @param voicePath        目标语音本地路径
+ *  @param voiceDuration    目标语音时长
+ *  @param sender           发送者的名字
+ *  @param date             发送时间
+ */
+- (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString*)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date {
+    XHMessage *voiceMessage = [[XHMessage alloc] initWithVoicePath:voicePath voiceUrl:nil voiceDuration:voiceDuration sender:sender timestamp:date];
+    
+    [Model_space sharedModel].string_text = nil;
+    [Model_space sharedModel].model_sound = voiceMessage;
+    [Model_space sharedModel].string_voicePath = voicePath;
+    //voiceMessage.avator = [UIImage imageNamed:@"11.png"];
+    //[self addMessage:voiceMessage];
+    //[self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeVoice];
+    
+    _bool_sound = YES;
+    if([Model_space sharedModel].string_space)
+    {
+        KWNSoundSendViewController *soundSend = [[KWNSoundSendViewController alloc] init];
+        [self.navigationController pushViewController:soundSend animated:YES];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_send) name:@"didClickSend" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_back) name:@"didClickBack" object:nil];
+        
+        
+        /*[Model_space sharedModel].string_text =nil;
+        [Model_space sharedModel].string_voicePath = nil;
+        KWNChatViewController *chat = [[KWNChatViewController alloc] init];
+        [Model_space sharedModel].controller_chat = chat;
+        [self presentViewController:chat animated:YES completion:nil];*/
+    }
+    else
+    {
+        //NSLog(@"%f",[[UIScreen mainScreen] currentMode].size.height);
+        [RESideMenu sharedInstance].panGestureEnabled = NO;
+        ChangeView_all *view_all = [[ChangeView_all alloc] initWithFrame:CGRectMake(0, 0, 320, [[UIScreen mainScreen] currentMode].size.height/2)];
+        [view_all configureViewWihtTag:0];
+        [self.view addSubview:view_all];
+        [view_all showAnimated];
+        
+        //[Model_space sharedModel].int_space = 0;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_send) name:@"didClickSend" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification_back) name:@"didClickBack" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotification) name:@"didClickFinish" object:nil];
+    }
 }
 
 @end

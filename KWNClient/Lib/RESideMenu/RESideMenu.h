@@ -63,7 +63,7 @@
 - (void)hideMenuViewController;
 - (void)presentRightViewController;
 
-- (void)panGestureRecognized:(UIPanGestureRecognizer *)recognizer;
+//- (void)panGestureRecognized:(UIPanGestureRecognizer *)recognizer;
 @end
 
 @protocol RESideMenuDelegate <NSObject>

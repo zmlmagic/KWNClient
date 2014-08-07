@@ -17,6 +17,8 @@ static Model_space *modelSpace = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         modelSpace = [[self alloc] init];
+        modelSpace.bool_first = NO;
+        modelSpace.bool_chatRoom = NO;
     });
     return modelSpace;
 }

@@ -143,7 +143,8 @@
     {
         case 0:
         {
-            [self popViewController];
+            [self.navigationController popViewControllerAnimated:YES];
+            //[self popViewController];
              [[NSNotificationCenter defaultCenter] postNotificationName:@"didClickBack"object:nil];
             
         }break;
@@ -159,14 +160,15 @@
         }break;
         case 2:
         {
-            if([_textContent.text length] == 0)
+            if([_textContent.text length] == 0 || [_textContent.text isEqualToString:@"请输入您要问的问题"])
             {
                 [UIUtils showAlterView:@"内容不能为空" afterTime:1.5f];
             }
             else
             {
                 [Model_space sharedModel].string_text = _textContent.text;
-                [self popViewController];
+                
+                [self.navigationController popViewControllerAnimated:NO];
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didClickSend"object:nil];
                 

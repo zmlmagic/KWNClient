@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "KWNChatViewController.h"
+#import "XHMessage.h"
 
 @interface Model_space : NSObject
 
@@ -29,6 +30,21 @@
 
 @property (strong, nonatomic) KWNChatViewController *controller_chat;
 
+@property (strong, nonatomic) XHMessage *model_sound;
+
+#pragma mark - 通知类型 -
+/**
+ *  通知类型
+ */
+@property (assign, nonatomic) NSInteger int_type;
+
+#pragma mark - 识别符 -
+/**
+ *  识别符
+ */
+@property (assign, nonatomic) BOOL bool_first;
+
+@property (assign, nonatomic) BOOL bool_chatRoom;
 
 + (Model_space *)sharedModel;
 

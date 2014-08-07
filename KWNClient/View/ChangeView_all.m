@@ -87,6 +87,10 @@
             view_con.layer.shadowRadius = 2.0;
             _view_content = view_con;
             
+            if(iPhone5){
+                view_con.frame = CGRectMake(view_con.frame.origin.x, view_con.frame.origin.y + 20, view_con.frame.size.width, view_con.frame.size.height);
+            }
+            
             UIImageView *imageView_back = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 278, 418)];
             imageView_back.image = [UIImage imageFileName:@"0.png"];
             [_view_content addSubview:imageView_back];
@@ -137,6 +141,10 @@
             view_con.layer.shadowOpacity = 0.5;
             view_con.layer.shadowRadius = 2.0;
             _view_content = view_con;
+            
+            if(iPhone5){
+                view_con.frame = CGRectMake(view_con.frame.origin.x, view_con.frame.origin.y + 20, view_con.frame.size.width, view_con.frame.size.height);
+            }
             
             UIImageView *imageView_back = [[UIImageView alloc] initWithFrame:CGRectMake(0, 50, 278, 289)];
             imageView_back.image = [UIImage imageFileName:@"1.png"];
@@ -189,6 +197,10 @@
             view_con.layer.shadowOpacity = 0.5;
             view_con.layer.shadowRadius = 2.0;
             _view_content = view_con;
+            
+            if(iPhone5){
+                view_con.frame = CGRectMake(view_con.frame.origin.x, view_con.frame.origin.y + 20, view_con.frame.size.width, view_con.frame.size.height);
+            }
             
             UIImageView *imageView_back = [[UIImageView alloc] initWithFrame:CGRectMake(0, 50, 278, 289)];
             imageView_back.image = [UIImage imageFileName:@"2.png"];
@@ -286,7 +298,8 @@
             [RESideMenu sharedInstance].panGestureEnabled = YES;
             
             [[NSNotificationCenter defaultCenter] postNotificationName:@"didClickFinish" object:nil];
-            
+         
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"didClickFinish_single" object:nil];
             
         }break;
         default:

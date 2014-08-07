@@ -9,6 +9,13 @@
 #import "KWNChatViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import "Model_space.h"
+#import "RESideMenu.h"
+
+@interface KWNChatViewController ()
+
+@property (strong, nonatomic) AVAudioPlayer *player;
+
+@end
 
 static KWNChatViewController *controller_chat = nil;
 
@@ -21,6 +28,14 @@ static KWNChatViewController *controller_chat = nil;
         controller_chat = [[self alloc] init];
     });
     return controller_chat;
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [Model_space sharedModel].bool_chatRoom = YES;
+}
+
+- (void)viewDidDisappear:(BOOL)animated{
+    [Model_space sharedModel].bool_chatRoom = NO;
 }
 
 - (void)viewDidLoad
@@ -57,6 +72,8 @@ static KWNChatViewController *controller_chat = nil;
     switch (button.tag)
     {
         case 0:{
+            //[[RESideMenu sharedInstance] presentMenuViewController];
+            //[self.navigationController popViewControllerAnimated:YES];
             [self dismissViewControllerAnimated:YES completion:nil];
         }break;
         default:
@@ -96,8 +113,9 @@ static KWNChatViewController *controller_chat = nil;
 }
 
 - (XHMessage *)getVoiceMessageWithBubbleMessageType:(XHBubbleMessageType)bubbleMessageType {
-    XHMessage *voiceMessage = [[XHMessage alloc] initWithVoicePath:nil voiceUrl:nil voiceDuration:@"1" sender:@"Jayson" timestamp:[NSDate date]];
-    //voiceMessage.avator = [UIImage imageNamed:@"avator"];
+    XHMessage *voiceMessage = [Model_space sharedModel].model_sound;
+    //XHMessage *voiceMessage = [[XHMessage alloc] initWithVoicePath:nil voiceUrl:nil voiceDuration:@"1" sender:@"Jayson" timestamp:[NSDate date]];
+    voiceMessage.avator = [UIImage imageNamed:@"11.png"];
     //voiceMessage.avatorUrl = @"http://www.pailixiu.com/jack/JieIcon@2x.png";
     voiceMessage.bubbleMessageType = bubbleMessageType;
     return voiceMessage;
@@ -109,6 +127,10 @@ static KWNChatViewController *controller_chat = nil;
     {
         [messages addObject:[self getTextMessageWithBubbleMessageType:XHBubbleMessageTypeSending]];
         [messages addObject:[self getTextMessageWithBubbleMessageType:XHBubbleMessageTypeReceiving]];
+    }
+    else if([Model_space sharedModel].model_sound){
+        [messages addObject:[self getVoiceMessageWithBubbleMessageType:XHBubbleMessageTypeSending]];
+         [messages addObject:[self getTextMessageWithBubbleMessageType:XHBubbleMessageTypeReceiving]];
     }
     else
     {
@@ -142,9 +164,15 @@ static KWNChatViewController *controller_chat = nil;
         case XHBubbleMessageMediaTypeVoice:
         {
             //DLog(@"message : %@", message.voicePath);
-            
-            SystemSoundID soundID;
-            AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:message.voicePath], &soundID);  AudioServicesPlaySystemSound(soundID);
+            NSString *string_path = message.voicePath;
+            NSURL *_url=[NSURL fileURLWithPath:string_path];
+            NSError *error;
+            _player=[[AVAudioPlayer alloc]initWithContentsOfURL:_url
+                                                          error:&error];
+            [_player prepareToPlay];
+            [_player play];
+            /*SystemSoundID soundID;
+            AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:message.voicePath], &soundID);  AudioServicesPlaySystemSound(soundID);*/
             
             [messageTableViewCell.messageBubbleView.animationVoiceImageView startAnimating];
             [messageTableViewCell.messageBubbleView.animationVoiceImageView performSelector:@selector(stopAnimating) withObject:nil afterDelay:3];
@@ -183,7 +211,6 @@ static KWNChatViewController *controller_chat = nil;
 }
 
 #pragma mark - XHMessageTableViewController Delegate
-
 - (BOOL)shouldLoadMoreMessagesScrollToTop {
     return NO;
 }

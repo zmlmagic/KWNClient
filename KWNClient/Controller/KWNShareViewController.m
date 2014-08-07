@@ -66,7 +66,8 @@
     {
         case 0:
         {
-            [self popViewController];
+            [self.navigationController popViewControllerAnimated:YES];
+            //[self popViewController];
             //[[RESideMenu sharedInstance] presentMenuViewController];
         }break;
         case 1:

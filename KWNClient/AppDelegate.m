@@ -17,6 +17,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
     KWNHomeViewController *controller_root = [[KWNHomeViewController alloc] init];
     KWNLeftSideViewController *controller_left = [[KWNLeftSideViewController alloc] init];
     RESideMenu *sideMenuViewController = [[RESideMenu alloc] initWithContentViewController:controller_root menuViewController:controller_left];
@@ -24,14 +25,16 @@
     sideMenuViewController.contentViewScaleValue = 0.9;
     sideMenuViewController.contentViewInPortraitOffsetCenterX = 95;
     sideMenuViewController.menuPreferredStatusBarStyle = UIStatusBarStyleLightContent;
+    [[RESideMenu sharedInstance] setPanGestureEnabled:NO];
     
-    MINavigationController *navigation_root = [[MINavigationController alloc] initWithRootViewController:sideMenuViewController];
-    controller_root.navigationController_MI = navigation_root;
+    UINavigationController *navigation_root = [[UINavigationController alloc] initWithRootViewController:sideMenuViewController];
+    navigation_root.navigationBarHidden = YES;
     
     self.window.rootViewController = navigation_root;
     [self.window makeKeyAndVisible];
     
     [self playAnimationDurationInBegin];
+    
     return YES;
 }
 

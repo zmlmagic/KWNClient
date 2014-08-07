@@ -6,8 +6,8 @@
 //  Copyright (c) 2014年 张明磊. All rights reserved.
 //
 
-#import "ZMViewController.h"
+#import "XHMessageTableViewController.h"
 
-@interface KWNHomeViewController : ZMViewController
+@interface KWNHomeViewController : XHMessageTableViewController
 
 @end

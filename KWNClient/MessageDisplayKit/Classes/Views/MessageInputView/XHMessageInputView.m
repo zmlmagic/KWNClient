@@ -10,6 +10,7 @@
 
 #import "NSString+MessageInputView.h"
 #import "XHMacro.h"
+#import "Model_space.h"
 
 #define kXHTouchToRecord         @"按住 说话"
 #define kXHTouchToFinish         @"松开 结束"
@@ -101,6 +102,24 @@
 #pragma mark - Action
 
 - (void)messageStyleButtonClicked:(UIButton *)sender {
+    if([Model_space sharedModel].bool_first && ![Model_space sharedModel].bool_chatRoom){
+        switch (sender.tag)
+        {
+            case 0:{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"notification_text" object:nil];
+                return;
+            }break;
+            case 1:{
+                
+            }break;
+            default:
+                break;
+        }
+    }
+    else{
+        [Model_space sharedModel].bool_first = YES;
+    }
+    
     NSInteger index = sender.tag;
     switch (index) {
         case 0: {
@@ -260,7 +279,7 @@
     }*/
     
     // 允许发送表情
-    if (self.allowsSendFace) {
+    /*if (self.allowsSendFace) {
         button = [self createButtonWithImage:[UIImage imageNamed:@"face"] HLImage:[UIImage imageNamed:@"face_HL"]];
         button.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
         [button setImage:[UIImage imageNamed:@"keyborad"] forState:UIControlStateSelected];
@@ -278,10 +297,10 @@
         [self addSubview:button];
         
         self.faceSendButton = button;
-    }
+    }*/
     
     // 输入框的高度和宽度
-    CGFloat width = CGRectGetWidth(self.bounds) - (allButtonWidth ? allButtonWidth : (textViewLeftMargin * 2)) + 5;
+    CGFloat width = CGRectGetWidth(self.bounds) - (allButtonWidth ? allButtonWidth : (textViewLeftMargin * 2)) + 5 - 65;
     CGFloat height = [XHMessageInputView textViewLineHeight];
     
     // 初始化输入框
@@ -317,7 +336,7 @@
             break;
         }
         case XHMessageInputViewStyleFlat: {
-            _inputTextView.frame = CGRectMake(textViewLeftMargin, 4.5f, width, height);
+            _inputTextView.frame = CGRectMake(textViewLeftMargin + 10, 4.5f, width, height);
             _inputTextView.backgroundColor = [UIColor clearColor];
             _inputTextView.layer.borderColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
             _inputTextView.layer.borderWidth = 0.65f;
@@ -348,6 +367,13 @@
         [button addTarget:self action:@selector(holdDownDragInside) forControlEvents:UIControlEventTouchDragEnter];
         [self addSubview:button];
         self.holdDownButton = button;
+    }
+    
+    if([Model_space sharedModel].bool_first || [Model_space sharedModel].bool_chatRoom){
+        
+    }
+    else{
+        [self messageStyleButtonClicked:self.voiceChangeButton];
     }
 }
 
